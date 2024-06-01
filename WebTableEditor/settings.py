@@ -1,3 +1,6 @@
+import os, inspect
+import django_dyn_dt
+
 """
 Django settings for WebTableEditor project.
 
@@ -37,6 +40,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
+    "appTP",
+    "django_dyn_dt",
 ]
 
 MIDDLEWARE = [
@@ -51,10 +57,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "WebTableEditor.urls"
 
+TEMPLATE_DIR_DATATB = os.path.join(BASE_DIR, "django_dyn_dt/templates")
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [TEMPLATE_DIR_DATATB],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -121,3 +129,15 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+DYN_DB_PKG_ROOT = os.path.dirname(inspect.getfile(django_dyn_dt))
+
+STATICFILES_DIRS = (
+    os.path.join(DYN_DB_PKG_ROOT, "templates/static"),
+)
+
+DYNAMIC_DATATB = {
+    "table" : "appTP.models.Table"
+}
+
+
