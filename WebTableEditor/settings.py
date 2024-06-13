@@ -42,8 +42,14 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     
     "appTP",
+
     "django_dyn_dt",
+
+    "rest_framework",
+    
 ]
+
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -62,7 +68,11 @@ TEMPLATE_DIR_DATATB = os.path.join(BASE_DIR, "django_dyn_dt/templates")
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [TEMPLATE_DIR_DATATB],
+        "DIRS": [
+                    TEMPLATE_DIR_DATATB,
+                    
+                ],
+
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
