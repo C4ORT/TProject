@@ -25,6 +25,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # path('', include('django_dyn_dt.urls')),
     path('api/', include('WebTableEditor.api.urls')),
+    path('streamlit/', TemplateView.as_view(template_name='streamlit.html')),
     
+
 
 ]
