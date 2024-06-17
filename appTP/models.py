@@ -31,6 +31,8 @@ class Customer(models.Model):
     position=models.CharField(max_length=100, default='')
     photo=models.ImageField(upload_to="images/", blank=True, null=True)
 
+    blob_photo = models.BinaryField()
+
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
