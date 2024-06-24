@@ -6,7 +6,10 @@ import glob
 import base64
 from PIL import Image
 from io import BytesIO
+from pathlib import Path
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+print(BASE_DIR)
 
 def get_thumbnail(path: str) -> Image:
     img = Image.open(path)
@@ -48,7 +51,7 @@ for row in rows:
     print(row, "\n")
 
     if str(path[increment])[2:-3]!='':
-        with open(f"C:/Users/4ORT/Desktop/TProject/{str(path[increment])[2:-3]}", "rb") as photo:
+        with open(f"{BASE_DIR}/{str(path[increment])[2:-3]}", "rb") as photo:
             temp=photo.read()
 
             # Преобразование BLOB-данных в строку Base64
