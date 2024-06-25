@@ -97,29 +97,31 @@ text_search = st.text_input("Search...", value="")
 df = pd.DataFrame(rows, columns=[ "direction_name", "department_name", "position_name","surname", "firstname", "patronymic","office", "phone", "cellphone","email"])
 # Отображение таблицы на Streamlit
 
-# m1 = df["id"].astype(str).str.contains(text_search)
-# m2 = df["direction_id"].astype(str).str.contains(text_search)
-m3 = df["direction_name"].str.contains(text_search)
-# m4 = df["department_id"].astype(str).str.contains(text_search)
-m5 = df["department_name"].str.contains(text_search)
-# m6 = df["position_id"].astype(str).str.contains(text_search)
-m7 = df["position_name"].str.contains(text_search)
-m8 = df["surname"].str.contains(text_search)
-m9 = df["firstname"].str.contains(text_search)
-m10 = df["patronymic"].str.contains(text_search)
-m11 = df["office"].str.contains(text_search)
-m12 = df["phone"].str.contains(text_search)
-m13 = df["cellphone"].str.contains(text_search)
-m14 = df["email"].str.contains(text_search)
+# # m1 = df["id"].astype(str).str.contains(text_search.lower())
+# # m2 = df["direction_id"].astype(str).str.contains(text_search.lower())
+# m3 = df["direction_name"].str.contains(text_search.lower())
+# # m4 = df["department_id"].astype(str).str.contains(text_search.lower())
+# m5 = df["department_name"].str.contains(text_search.lower())
+# # m6 = df["position_id"].astype(str).str.contains(text_search.lower())
+# m7 = df["position_name"].str.contains(text_search.lower())
+# m8 = df["surname"].str.contains(text_search.lower())
+# m9 = df["firstname"].str.contains(text_search.lower())
+# m10 = df["patronymic"].str.contains(text_search.lower())
+# m11 = df["office"].str.contains(text_search.lower())
+# m12 = df["phone"].str.contains(text_search.lower())
+# m13 = df["cellphone"].str.contains(text_search.lower())
+# m14 = df["email"].str.contains(text_search.lower())
+
+m = rows["search"].str.contains(text_search.lower())
 
 
 
 
-
-df_search = df[m3 | m5 | m7 | m8 | m9 | m10 | m11 | m12 | m13 | m14]
+# m3 | m5 | m7 | m8 | m9 | m10 | m11 | m12 | m13 | m14
+df_search = df[m]
 
 if text_search:
-    st.dataframe(df_search, column_config={"photo_blob": st.column_config.ImageColumn()}, hide_index=True)
+    st.dataframe(df_search, column_config={"photo_blob": st.column_config.ImageColumn()}, hide_index=True, width=2000)
 
 
 # def aggrid_interactive_table(df: pd.DataFrame):
