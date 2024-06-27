@@ -9,6 +9,7 @@ from io import BytesIO
 from pathlib import Path
 from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import GridUpdateMode
+from streamlit_modal import Modal
 
 
 def wide_space_default():
@@ -54,8 +55,19 @@ conn=st.connection("mydb", type='sql')
 
 rows = conn.query('SELECT * from view_personals;', ttl=600)
 
+st.html("""
+  <style>
+    [alt=Logo] {
+      height: 5rem;
+    }
+  </style>
+        """)
 
-text_search = st.text_input("Search...", value="")
+st.write("")
+
+st.logo(image=f"{BASE_DIR}/templates/image/logo.jpg")
+
+text_search = st.text_input("",placeholder="Поиск...", value="")
 
 
 # обработка фото по пути из бд и запись в другую ячейку в формате BLOB sqlite3
@@ -94,73 +106,48 @@ text_search = st.text_input("Search...", value="")
 # connection.close()
 #------------------------
 
-df = pd.DataFrame(rows, columns=[ "direction_name", "department_name", "position_name","surname", "firstname", "patronymic","office", "phone", "cellphone","email"])
+pd.set_option('display.max_columns', None)
+df = pd.DataFrame(rows, columns=["direction_name", "department_name", "position_name","surname", "firstname", "patronymic","office", "phone", "cellphone","email"])
+df = df.rename(columns={"direction_name" : "Дирекция", "department_name" : "Департамент", "position_name" : "Должность","surname" : "Фамилия", "firstname" : "Имя", "patronymic" : "Отчество","office" : "Кабинет", "phone" : "Тел.", "cellphone" : "Личный тел.","email" : "E-mail"})
 # Отображение таблицы на Streamlit
 
-# # m1 = df["id"].astype(str).str.contains(text_search.lower())
-# # m2 = df["direction_id"].astype(str).str.contains(text_search.lower())
-# m3 = df["direction_name"].str.contains(text_search.lower())
-# # m4 = df["department_id"].astype(str).str.contains(text_search.lower())
-# m5 = df["department_name"].str.contains(text_search.lower())
-# # m6 = df["position_id"].astype(str).str.contains(text_search.lower())
-# m7 = df["position_name"].str.contains(text_search.lower())
-# m8 = df["surname"].str.contains(text_search.lower())
-# m9 = df["firstname"].str.contains(text_search.lower())
-# m10 = df["patronymic"].str.contains(text_search.lower())
-# m11 = df["office"].str.contains(text_search.lower())
-# m12 = df["phone"].str.contains(text_search.lower())
-# m13 = df["cellphone"].str.contains(text_search.lower())
-# m14 = df["email"].str.contains(text_search.lower())
 
 m = rows["search"].str.contains(text_search.lower())
 
 
 
-
-# m3 | m5 | m7 | m8 | m9 | m10 | m11 | m12 | m13 | m14
 df_search = df[m]
 
 if text_search:
-    st.dataframe(df_search, column_config={"photo_blob": st.column_config.ImageColumn()}, hide_index=True, width=2000)
+    event = st.dataframe(df_search, use_container_width=True, column_config={"photo_blob": st.column_config.ImageColumn()}, hide_index=True, width=2000 #,key="data", on_select="rerun", selection_mode="single-row"
+                         )
+    
+    # people = event.selection.rows
+    # print(df.iloc[people])
 
+    @st.experimental_dialog("Личная карточка", width="large")
+    def vote(people_id):
+        st.write(f"Фамилия: {str(df.filter(regex='surname').iloc[people_id]).split()[-1]}  \n",
+                 f"Имя: {str(df.filter(regex='firstname').iloc[people_id]).split()[-1]}  \n", 
+                 f"Отчество: {str(df.filter(regex='patronymic').iloc[people_id]).split()[-1]}  \n",
+                 f"Кабинет: {str(df.filter(regex='office').iloc[people_id]).split()[-1]}  \n",
+                 f"Внутренний тел.: {str(df.filter(regex='phone').iloc[people_id]).split()[-1]}  \n",
+                 f"Личный тел.: {str(df.filter(regex='cellphone').iloc[people_id]).split()[-1]}  \n",
+                 f"E-mail: {str(df.filter(regex='email').iloc[people_id]).split()[-1]}  \n",
+                 f"DirectionName: {str(df.filter(regex='direction_name').iloc[people_id]).split()[-1]}  \n",
+                 f"Департамент: {str(df.filter(regex='department_name').iloc[people_id]).split()[-1]}  \n",
+                 f"Должность: {str(df.filter(regex='position_name').iloc[people_id]).split()[-1]}  \n",
+                #  f"{str(df.filter(regex='patronymic').iloc[people]).split()[-1]}  \n", фото добавить
+                #  ИСПРАВИТЬ ID АБСОЛЮТНЫЙ НА ID фрейма 
+                 
+                 )
+        
 
-# def aggrid_interactive_table(df: pd.DataFrame):
-#     """Creates an st-aggrid interactive table based on a dataframe.
+    # if people:
+    #     vote(people)
 
-#     Args:
-#         df (pd.DataFrame]): Source dataframe
-
-#     Returns:
-#         dict: The selected row
-#     """
-#     options = GridOptionsBuilder.from_dataframe(
-#         df, enableRowGroup=True, enableValue=True, enablePivot=True
-#     )
-
-#     options.configure_side_bar()
-
-#     options.configure_selection("single")
-#     selection = AgGrid(
-#         df,
-#         enable_enterprise_modules=True,
-#         gridOptions=options.build(),
-#         update_mode=GridUpdateMode.MODEL_CHANGED,
-#         allow_unsafe_jscode=True,
-#     )
-
-#     return selection
-
-
-
-# if text_search:
-#     selection = aggrid_interactive_table(df=df_search)
-
-#     if selection:
-#         st.write("You selected:")
-#         st.write(selection["selected_rows"])
+    
 
 
 
-
-# st.dataframe(df, column_config={"photo_blob": st.column_config.ImageColumn()})
 
