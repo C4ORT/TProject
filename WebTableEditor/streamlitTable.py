@@ -147,33 +147,20 @@ df_search = df[m]
 if text_search:
     event = st.dataframe(df_search, use_container_width=True, column_config={"photo_blob": st.column_config.ImageColumn()}, hide_index=True, width=2000 ,key="data", on_select="rerun", selection_mode="single-row"
                          )
-    # selection = dataframe_with_selections(df_search, init_value=False)
-    # print("Selection PRINT: ",selection)
-
-    # if len(selection.index) > 1:
-    #     print("NEED: 11111111111111111111111111111111111111111111111111111",selection.iterrows(),"TO: ",selection)
-        # for index, row in df.iterrows():
-        #     if row["Select"] == "st.checkbox":
-        #         df.at[index,"Select"]= False
-
-    # selection=str(selection).split()
- 
-
-    # if selection[0]!="Empty":
-    #     vote(selection)
 
     people = event.selection.rows
     # print("EVENT 1 : ",event['selection']['rows'])
     # print("EVENT: ",event)
     print("PEOPLE: ",people)
 
-    
 
 
     @st.experimental_dialog("Личная карточка", width="large")
     def vote(absolut_id):
         # {str(df.filter(regex='surname').iloc[selection[6]]).split()[-1]}          f"Фамилия: {conn.query('SELECT surname from view_personals WHERE id = ?;', (people[0],))}",
         print("ZZZZZ")
+        
+        col1, col2 = st.columns(2)
         
         surname = conn.query(f'SELECT surname from view_personals WHERE id = {absolut_id};')
         firstname = conn.query(f'SELECT firstname from view_personals WHERE id = {absolut_id};')
@@ -189,22 +176,27 @@ if text_search:
         
         
         # print("ABSOLUTE ID: ",absolut_id)
-        # print("SURR: ",str(surname).split()[-1])
+        # print("SURR: ",str(direction_name).split()[2:])
+        with col1:
+            st.write(   f"Фамилия: {' '.join(str(surname).split()[2:])}  \n",
+                        f"Имя: {' '.join(str(firstname).split()[2:])}  \n", 
+                        f"Отчество: {' '.join(str(patronymic).split()[2:])}  \n",
+                        f"Кабинет: {' '.join(str(office).split()[2:])}  \n",
+                        f"Внутренний тел.: {' '.join(str(phone).split()[2:])}  \n",
+                        f"Личный тел.: {' '.join(str(cellphone).split()[2:])}  \n",
+                        f"E-mail: {' '.join(str(email).split()[2:])}  \n",
+                        f"Дирекция: {' '.join(str(direction_name).split()[2:])}  \n",
+                        f"Департамент: {' '.join(str(department_name).split()[2:])}  \n",
+                        f"Должность: {' '.join(str(position_name).split()[2:])}  \n",
+                    #  фото добавить
+                    
 
-        st.write(   f"Фамилия: {str(surname).split()[-1]}  \n",
-                    f"Имя: {str(firstname).split()[-1]}  \n", 
-                    f"Отчество: {str(patronymic).split()[-1]}  \n",
-                    f"Кабинет: {str(office).split()[-1]}  \n",
-                    f"Внутренний тел.: {str(phone).split()[-1]}  \n",
-                    f"Личный тел.: {str(cellphone).split()[-1]}  \n",
-                    f"E-mail: {str(email).split()[-1]}  \n",
-                    f"Дирекция: {str(direction_name).split()[-1]}  \n",
-                    f"Департамент: {str(department_name).split()[-1]}  \n",
-                    f"Должность: {str(position_name).split()[-1]}  \n",
-                #  фото добавить
-                
+                        )
+            
+        with col2:
+            st.write("PHOTO")
 
-                    )
+
     if people:
         absolut_id = df_search.iloc[people].index[0]+1
     
