@@ -10,6 +10,7 @@ from pathlib import Path
 from st_aggrid import AgGrid, GridOptionsBuilder
 from st_aggrid.shared import GridUpdateMode
 from streamlit_modal import Modal
+from streamlit_js_eval import streamlit_js_eval
 
 
 def wide_space_default():
@@ -112,6 +113,31 @@ df = df.rename(columns={"direction_name" : "Дирекция", "department_name"
 # Отображение таблицы на Streamlit
 
 
+
+@st.experimental_fragment
+def dataframe_with_selections(df: pd.DataFrame, init_value: bool = False) -> pd.DataFrame:
+    df_with_selections = df.copy()
+    df_with_selections.insert(0, "Select", init_value)
+
+    # Get dataframe row-selections from user with st.data_editor
+    edited_df = st.data_editor(
+        df_with_selections,
+        hide_index=True,
+        column_config={"Select": st.column_config.CheckboxColumn(required=False)},
+        disabled=df.columns,
+        
+    )
+
+    # Filter the dataframe using the temporary column, then drop the column
+    selected_rows = edited_df[edited_df.Select]
+
+    
+
+        # st.experimental_rerun()
+    
+    return selected_rows.drop('Select', axis=1)
+
+
 m = rows["search"].str.contains(text_search.lower())
 
 
@@ -119,33 +145,74 @@ m = rows["search"].str.contains(text_search.lower())
 df_search = df[m]
 
 if text_search:
-    event = st.dataframe(df_search, use_container_width=True, column_config={"photo_blob": st.column_config.ImageColumn()}, hide_index=True, width=2000 #,key="data", on_select="rerun", selection_mode="single-row"
+    event = st.dataframe(df_search, use_container_width=True, column_config={"photo_blob": st.column_config.ImageColumn()}, hide_index=True, width=2000 ,key="data", on_select="rerun", selection_mode="single-row"
                          )
+    # selection = dataframe_with_selections(df_search, init_value=False)
+    # print("Selection PRINT: ",selection)
+
+    # if len(selection.index) > 1:
+    #     print("NEED: 11111111111111111111111111111111111111111111111111111",selection.iterrows(),"TO: ",selection)
+        # for index, row in df.iterrows():
+        #     if row["Select"] == "st.checkbox":
+        #         df.at[index,"Select"]= False
+
+    # selection=str(selection).split()
+ 
+
+    # if selection[0]!="Empty":
+    #     vote(selection)
+
+    people = event.selection.rows
+    # print("EVENT 1 : ",event['selection']['rows'])
+    # print("EVENT: ",event)
+    print("PEOPLE: ",people)
+
     
-    # people = event.selection.rows
-    # print(df.iloc[people])
+
 
     @st.experimental_dialog("Личная карточка", width="large")
-    def vote(people_id):
-        st.write(f"Фамилия: {str(df.filter(regex='surname').iloc[people_id]).split()[-1]}  \n",
-                 f"Имя: {str(df.filter(regex='firstname').iloc[people_id]).split()[-1]}  \n", 
-                 f"Отчество: {str(df.filter(regex='patronymic').iloc[people_id]).split()[-1]}  \n",
-                 f"Кабинет: {str(df.filter(regex='office').iloc[people_id]).split()[-1]}  \n",
-                 f"Внутренний тел.: {str(df.filter(regex='phone').iloc[people_id]).split()[-1]}  \n",
-                 f"Личный тел.: {str(df.filter(regex='cellphone').iloc[people_id]).split()[-1]}  \n",
-                 f"E-mail: {str(df.filter(regex='email').iloc[people_id]).split()[-1]}  \n",
-                 f"DirectionName: {str(df.filter(regex='direction_name').iloc[people_id]).split()[-1]}  \n",
-                 f"Департамент: {str(df.filter(regex='department_name').iloc[people_id]).split()[-1]}  \n",
-                 f"Должность: {str(df.filter(regex='position_name').iloc[people_id]).split()[-1]}  \n",
-                #  f"{str(df.filter(regex='patronymic').iloc[people]).split()[-1]}  \n", фото добавить
-                #  ИСПРАВИТЬ ID АБСОЛЮТНЫЙ НА ID фрейма 
-                 
-                 )
+    def vote(absolut_id):
+        # {str(df.filter(regex='surname').iloc[selection[6]]).split()[-1]}          f"Фамилия: {conn.query('SELECT surname from view_personals WHERE id = ?;', (people[0],))}",
+        print("ZZZZZ")
+        
+        surname = conn.query(f'SELECT surname from view_personals WHERE id = {absolut_id};')
+        firstname = conn.query(f'SELECT firstname from view_personals WHERE id = {absolut_id};')
+        patronymic = conn.query(f'SELECT patronymic from view_personals WHERE id = {absolut_id};')
+        office = conn.query(f'SELECT office from view_personals WHERE id = {absolut_id};')
+        phone = conn.query(f'SELECT phone from view_personals WHERE id = {absolut_id};')
+        cellphone = conn.query(f'SELECT cellphone from view_personals WHERE id = {absolut_id};')
+        email = conn.query(f'SELECT email from view_personals WHERE id = {absolut_id};')
+        direction_name = conn.query(f'SELECT direction_name from view_personals WHERE id = {absolut_id};')
+        department_name = conn.query(f'SELECT department_name from view_personals WHERE id = {absolut_id};')
+        position_name = conn.query(f'SELECT position_name from view_personals WHERE id = {absolut_id};')
+        # photo = conn.query(f'SELECT surname from view_personals WHERE id = {absolut_id};')
+        
+        
+        # print("ABSOLUTE ID: ",absolut_id)
+        # print("SURR: ",str(surname).split()[-1])
+
+        st.write(   f"Фамилия: {str(surname).split()[-1]}  \n",
+                    f"Имя: {str(firstname).split()[-1]}  \n", 
+                    f"Отчество: {str(patronymic).split()[-1]}  \n",
+                    f"Кабинет: {str(office).split()[-1]}  \n",
+                    f"Внутренний тел.: {str(phone).split()[-1]}  \n",
+                    f"Личный тел.: {str(cellphone).split()[-1]}  \n",
+                    f"E-mail: {str(email).split()[-1]}  \n",
+                    f"Дирекция: {str(direction_name).split()[-1]}  \n",
+                    f"Департамент: {str(department_name).split()[-1]}  \n",
+                    f"Должность: {str(position_name).split()[-1]}  \n",
+                #  фото добавить
+                
+
+                    )
+    if people:
+        absolut_id = df_search.iloc[people].index[0]+1
+    
+        vote(absolut_id)
+    
         
 
-    # if people:
-    #     vote(people)
-
+    
     
 
 
